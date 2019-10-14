@@ -27,16 +27,23 @@ function layout_apps(list) {
 
   for (i=0,l=list.length;i < l; i++) {
     key = list[i];
+    const curKey = list[i]
     $("#ga-grid").append(
-      $('<li>').attr('class', 'ui-state-default')
-               .data('ga-name', key).append(
-        $('<a>').attr('href', gapps_info[key]['url'])
-                .attr('class', 'ga-lnk').append(
-            $('<span>').attr('class', 'ga-ico gi-' + key)
-                       .css('background-position', gapps_info[key]['iconpos'])
-          ).append(
-            $('<span>').attr('class', 'ga-ico-desc').text(gapps_info[key]['desc'])
-          )
+      $('<li>').attr('class', 'ui-state-default').data('ga-name', key).append(
+                  
+                $('<a>').attr('href', gapps_info[key]['url']).attr('class', 'ga-lnk')
+                  .attr('id', 'div-'+curKey).append(
+                      
+                      $('<div>').attr('class', 'nein-wrapper').append(
+                          $('<div>').attr('class', 'ga-ico-nein gi-' + key).attr('style','display: none')
+                            .attr('id', 'xbtn-'+curKey)
+                        )
+                    ).append(
+                      
+                      $('<span>').attr('class', 'ga-ico gi-' + key).css('background-position', gapps_info[key]['iconpos'])
+                    ).append(
+                      $('<span>').attr('class', 'ga-ico-desc').text(gapps_info[key]['desc'])
+                    )                 
         )
     );
   }
