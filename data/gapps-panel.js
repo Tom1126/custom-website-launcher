@@ -13,7 +13,7 @@ var sequence = new Array();
 //
 function get_sequence() {
   as = new Array();
-  $("#ga-grid li").each(function() {
+  $("#ga-grid li").each(function () {
     as.push($(this).data("ga-name"));
   });
   return as.join(',');
@@ -25,20 +25,48 @@ function get_sequence() {
 function layout_apps(list) {
   $("#ga-grid").empty();
 
-  for (i=0,l=list.length;i < l; i++) {
+  for (i = 0, l = list.length; i < l; i++) {
     key = list[i];
+    const curKey = list[i]
     $("#ga-grid").append(
-      $('<li>').attr('class', 'ui-state-default')
-               .data('ga-name', key).append(
-        $('<a>').attr('href', gapps_info[key]['url'])
-                .attr('class', 'ga-lnk').append(
-            $('<span>').attr('class', 'ga-ico gi-' + key)
-                       .css('background-position', gapps_info[key]['iconpos'])
-          ).append(
-            $('<span>').attr('class', 'ga-ico-desc').text(gapps_info[key]['desc'])
+      $('<div>')
+      .append($('<button id="xbtn-'+ curKey+'" style="margin-left:20%;display:none;">X</button>')
+      )
+      .append($('<li>').attr('class', 'ui-state-default')
+        .data('ga-name', curKey).append(
+          $('<a>').attr('href', gapps_info[key]['url'])
+          .attr('class', 'ga-lnk')
+          .attr('id', 'div-' + curKey).append(
+            $('<span>').attr('class', 'ga-ico gi-' + curKey)
+            .css('background-position', gapps_info[curKey]['iconpos'])
+          ).append($('<span>').attr('class', 'ga-ico-desc').text(gapps_info[curKey]['desc'])
           )
         )
+      )
     );
+  }
+
+  /**
+   * Loop to add onclick and onhoover event listeners
+   */
+  for (i = 0, l = list.length; i < l; i++) {
+    const curKey = list[i]
+    document.getElementById('xbtn-' + curKey).addEventListener('click', ev => {
+      console.log(`Current key: ${curKey}`)
+      gapps_info[curKey] = {}
+      console.log(gapps_info)
+      loadPanel()
+      const updatedList = get_sequence()
+      browser.storage.sync.set({
+        'appList': updatedList
+      });
+    })
+    document.getElementById('div-' + curKey).addEventListener('mouseenter',() => {
+      document.getElementById('xbtn-' + curKey).style.display = 'block'
+    })
+    document.getElementById('div-' + curKey).addEventListener('mouseleave',() => {
+      document.getElementById('xbtn-' + curKey).style.display = 'none'
+    }) 
   }
 }
 
@@ -59,16 +87,18 @@ function load_panel(gapps) {
   //
   // Let add-on know that app sequence was changed
   //
-  $("#ga-grid").on("sortupdate", function(event,ui) {
+  $("#ga-grid").on("sortupdate", function (event, ui) {
     var s = get_sequence();
-    browser.storage.sync.set({'appList': s});
+    browser.storage.sync.set({
+      'appList': s
+    });
     console.log("Saving updated sequence after sortupdate");
   });
 
   //
   // Setup to mask click handling during sorting
   //
-  $("#ga-grid").on("sortstart", function(event,ui) {
+  $("#ga-grid").on("sortstart", function (event, ui) {
     console.log("Started sorting. Following click will not be entertained until sortupdate");
     has_update = 1;
   });
@@ -76,11 +106,13 @@ function load_panel(gapps) {
   //
   // Send link click event to add-on, so that panel can be hidden
   //
-  $(".ga-lnk").on("click", function(e) {
+  $(".ga-lnk").on("click", function (e) {
     if (has_update) {
       console.log("Skipping this click event - has_update=1");
     } else {
-      var new_tab = browser.tabs.create({url: this.href});
+      browser.tabs.create({
+        url: this.href
+      });
       e.preventDefault();
       window.close();
     }
@@ -109,8 +141,8 @@ function get_applist_arr(applist) {
 // Validated to make sure that App list items are valid keys to
 // the App information object
 //
-function validate_applist(applist,gapps_info) {
-  applist.every(function(e,i,a) {
+function validate_applist(applist, gapps_info) {
+  applist.every(function (e, i, a) {
     if (!gapps_info.e) {
       return new Array;
     }
@@ -119,15 +151,26 @@ function validate_applist(applist,gapps_info) {
   return applist;
 }
 
+function loadPanel() {
+  const default_applist = Object.keys(gapps_info).slice(0, 9).join(',');
+
+  browser.storage.sync.get({
+    appList
+  }, function (items) {
+    var applst = validate_applist(get_applist_arr(items.appList), gapps_info);
+    load_panel(applst);
+  });
+}
+
 // -------------------------------------------------
 // Main function that sets up the panel
 // -------------------------------------------------
-$(function() {
-  var default_applist = Object.keys(gapps_info).slice(0,9).join(',');
+$(function () {
+  var default_applist = Object.keys(gapps_info).slice(0, 9).join(',');
 
   browser.storage.sync.get({
     appList: default_applist
-  }, function(items) {
+  }, function (items) {
     var applst = validate_applist(get_applist_arr(items.appList), gapps_info);
     load_panel(applst);
   });
