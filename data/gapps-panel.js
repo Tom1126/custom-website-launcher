@@ -3,6 +3,7 @@
 // -------------------------------------------------
 var has_update = 0;
 var sequence = new Array();
+var websites;
 
 // -------------------------------------------------
 // Helper functions
@@ -16,80 +17,111 @@ function get_sequence() {
   $("#ga-grid li").each(function () {
     as.push($(this).data("ga-name"));
   });
+
+  console.log('as', as)
   return as.join(',');
 }
 
 //
 // Based on the current app sequence, construct the grid layout in the panel
 //
-function layout_apps(list) {
+function layout_apps() {
   $("#ga-grid").empty();
 
-  for (i = 0, l = list.length; i < l; i++) {
-    key = list[i];
-    const curKey = list[i]
+  /*
+  const appListToLoad = Object.keys(websites)
+  for (let i = 0; i < appListToLoad.length; i++) {
+    key = appListToLoad[i];
+    const curKey = appListToLoad[i]
+
     $("#ga-grid").append(
       $('<div>')
-      .append($('<button id="xbtn-'+ curKey+'" style="margin-left:20%;display:none;">X</button>')
-      )
       .append($('<li>').attr('class', 'ui-state-default')
         .data('ga-name', curKey).append(
-          $('<a>').attr('href', gapps_info[key]['url'])
+          $('<a>').attr('href', websites[key]['url'])
           .attr('class', 'ga-lnk')
           .attr('id', 'div-' + curKey).append(
             $('<span>').attr('class', 'ga-ico gi-' + curKey)
-            .css('background-position', gapps_info[curKey]['iconpos'])
-          ).append($('<span>').attr('class', 'ga-ico-desc').text(gapps_info[curKey]['desc'])
+            .append(
+              $('<img>')
+              .attr('height', '32')
+              .attr('width', '32')
+              .attr('src', websites[curKey]['faviconurl'] ? websites[curKey]['faviconurl'] : `gapps-icons.png`)
+            )
+            .css('background-position', websites[curKey]['iconpos'])
+          ).append(
+            $('<span>').attr('class', 'ga-ico-desc').text(websites[curKey]['desc'])
           )
         )
       )
     );
   }
+  */
 
-  /**
-   * Loop to add onclick and onhoover event listeners
-   */
-  for (i = 0, l = list.length; i < l; i++) {
-    const curKey = list[i]
-    document.getElementById('xbtn-' + curKey).addEventListener('click', ev => {
-      console.log(`Current key: ${curKey}`)
-      gapps_info[curKey] = {}
-      console.log(gapps_info)
-      loadPanel()
-      const updatedList = get_sequence()
-      browser.storage.sync.set({
-        'appList': updatedList
-      });
+
+  browser.storage.local.get('appList')
+    .then(results => {
+      const appListToLoad = Object.keys(results.appList)
+      console.log(`Loading applist 2`)
+      console.log(appListToLoad)
+
+      const wholeList = results.appList
+      websites = results.appList
+
+      for (let i = 0; i < appListToLoad.length; i++) {
+        key = appListToLoad[i];
+        const curKey = appListToLoad[i]
+
+        $("#ga-grid").append(
+          $('<div>')
+          .append($('<li>').attr('class', 'ui-state-default')
+            .data('ga-name', curKey).append(
+              $('<a>').attr('href', wholeList[key]['url'])
+              .attr('class', 'ga-lnk')
+              .attr('id', 'div-' + curKey).append(
+                $('<span>').attr('class', 'ga-ico gi-' + curKey)
+                .append(
+                  $('<img>')
+                  .attr('height', '32')
+                  .attr('width', '32')
+                  .attr('src', wholeList[curKey]['faviconurl'] ? wholeList[curKey]['faviconurl'] : `gapps-icons.png`)
+                )
+                .css('background-position', wholeList[curKey]['iconpos'])
+              ).append(
+                $('<span>').attr('class', 'ga-ico-desc').text(wholeList[curKey]['desc'])
+              )
+            )
+          )
+        );
+      }
+
     })
-    document.getElementById('div-' + curKey).addEventListener('mouseenter',() => {
-      document.getElementById('xbtn-' + curKey).style.display = 'block'
+
+    .catch(err => {
+      console.error(err)
     })
-    document.getElementById('div-' + curKey).addEventListener('mouseleave',() => {
-      document.getElementById('xbtn-' + curKey).style.display = 'none'
-    }) 
-  }
+
 }
 
 //
 // Layout the panel and set up event handlers
 //
-function load_panel(gapps) {
-  console.log("Loading - " + gapps);
+function load_panel() {
 
-  layout_apps(gapps);
+  layout_apps();
 
   //
   // Set up grid sorting
   //
-  $("#ga-grid").sortable();
-  $("#ga-grid").disableSelection();
+  //$("#ga-grid").sortable();
+  //$("#ga-grid").disableSelection();
 
   //
   // Let add-on know that app sequence was changed
   //
   $("#ga-grid").on("sortupdate", function (event, ui) {
     var s = get_sequence();
-    browser.storage.sync.set({
+    browser.storage.local.set({
       'appList': s
     });
     console.log("Saving updated sequence after sortupdate");
@@ -126,7 +158,10 @@ function load_panel(gapps) {
 function get_applist_arr(applist) {
   var ret;
 
-  ret = applist.split(",", 9)
+  const list = Object.keys(applist).slice(0, 36).join(",")
+
+  ret = list.split(",", 9)
+  //ret = applist.split(",", 9)
   ret.map(function (app) {
     app.replace(/\s+/gi, '');
   });
@@ -152,26 +187,15 @@ function validate_applist(applist, gapps_info) {
 }
 
 function loadPanel() {
-  const default_applist = Object.keys(gapps_info).slice(0, 9).join(',');
 
-  browser.storage.sync.get({
-    appList
-  }, function (items) {
-    var applst = validate_applist(get_applist_arr(items.appList), gapps_info);
-    load_panel(applst);
-  });
+  load_panel()
+
 }
+//console.log('item:::', items)
 
+$(function () {
+  loadPanel()
+})
 // -------------------------------------------------
 // Main function that sets up the panel
 // -------------------------------------------------
-$(function () {
-  var default_applist = Object.keys(gapps_info).slice(0, 9).join(',');
-
-  browser.storage.sync.get({
-    appList: default_applist
-  }, function (items) {
-    var applst = validate_applist(get_applist_arr(items.appList), gapps_info);
-    load_panel(applst);
-  });
-});

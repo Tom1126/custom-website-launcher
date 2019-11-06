@@ -1,73 +1,86 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bootstrap-material-design.min.css">
   <style type="text/css">
-body {
-  padding-bottom: 1em;
-}
-#update-event {
-  display: none;
-}
-#ga-grid {
-  width: 240px;
-  height: 250px;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 240px;
-}
-#ga-grid li {
-  width: 75px;
-  margin: 3px 3px 3px 0;
-  padding: 1px;
-  float: left;
-}
-#ga-grid .ga-ico {
-  display: block;
-  vertical-align: top;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  height: 64px;
-  width: 64px;
-  background-image: url("gapps-icons.png");
-  background-size: 64px 2334px;
-}
-#ga-grid .ga-ico-desc {
-  display: block;
-  font-family: sans-serif;
-  font-size: small;
-  vertical-align: bottom;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  color: black;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 73px;
+    body {
+      padding-bottom: 1em;
+    }
 
-}
-#ga-grid .ga-lnk {
-  text-decoration: none;
-}
-</style>
+    #update-event {
+      display: none;
+    }
+
+    #ga-grid {
+      width: 240px;
+      height: 250px;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      width: 240px;
+    }
+
+    #ga-grid li {
+      width: 75px;
+      margin: 3px 3px 3px 0;
+      padding: 1px;
+      float: left;
+    }
+
+    #ga-grid .ga-ico {
+      display: block;
+      vertical-align: top;
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+      height: 48px;
+      width: 48px;
+    }
+
+    #ga-grid .ga-ico-desc {
+      display: block;
+      font-family: sans-serif;
+      font-size: small;
+      vertical-align: bottom;
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+      color: black;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      width: 73px;
+
+    }
+
+    #ga-grid .ga-lnk {
+      text-decoration: none;
+    }
+  </style>
 
 </head>
 
 <body>
-  <span id="update-event"></span>
-  <button id="addBtn">Add</button>
-  <button id="addBtn2">Add 2</button>
+
+  <button type="button" class="btn btn-raised btn-success btn-sm btn-block" id="addBtn2">
+    <span class="icon is-small"><i class="fas fa-plus"></i></span>
+    <span>Add current website</span>
+  </button>
+
   <ul id="ga-grid">
   </ul>
+
   <script src="jquery.min.js"></script>
-  <script src="jquery-ui.min.js"></script>
+  <script src="bootstrap-material-design.min.js"></script>
+  <script src="font-awesome.js"></script>
   <script src="gapps-info.js"></script>
   <script src="gapps-panel.js"></script>
   <script src="utils.js"></script>
+
 </body>
-  
+
 </html>
