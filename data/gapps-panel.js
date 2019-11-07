@@ -28,37 +28,6 @@ function get_sequence() {
 function layout_apps() {
   $("#ga-grid").empty();
 
-  /*
-  const appListToLoad = Object.keys(websites)
-  for (let i = 0; i < appListToLoad.length; i++) {
-    key = appListToLoad[i];
-    const curKey = appListToLoad[i]
-
-    $("#ga-grid").append(
-      $('<div>')
-      .append($('<li>').attr('class', 'ui-state-default')
-        .data('ga-name', curKey).append(
-          $('<a>').attr('href', websites[key]['url'])
-          .attr('class', 'ga-lnk')
-          .attr('id', 'div-' + curKey).append(
-            $('<span>').attr('class', 'ga-ico gi-' + curKey)
-            .append(
-              $('<img>')
-              .attr('height', '32')
-              .attr('width', '32')
-              .attr('src', websites[curKey]['faviconurl'] ? websites[curKey]['faviconurl'] : `gapps-icons.png`)
-            )
-            .css('background-position', websites[curKey]['iconpos'])
-          ).append(
-            $('<span>').attr('class', 'ga-ico-desc').text(websites[curKey]['desc'])
-          )
-        )
-      )
-    );
-  }
-  */
-
-
   browser.storage.local.get('appList')
     .then(results => {
       const appListToLoad = Object.keys(results.appList)
@@ -74,11 +43,16 @@ function layout_apps() {
 
         $("#ga-grid").append(
           $('<div>')
-          .append($('<li>').attr('class', 'ui-state-default')
-            .data('ga-name', curKey).append(
+          .append($('<li>').attr('class', 'ui-state-default').data('ga-name', curKey).append(
               $('<a>').attr('href', wholeList[key]['url'])
               .attr('class', 'ga-lnk')
               .attr('id', 'div-' + curKey).append(
+
+                $('<div>').attr('class', 'nein-wrapper').append(
+                  $('<div>').attr('class', 'ga-ico-nein gi-' + key).attr('style','display: none')
+                    .attr('id', 'xbtn-'+curKey)
+                )
+            ).append(
                 $('<span>').attr('class', 'ga-ico gi-' + curKey)
                 .append(
                   $('<img>')
@@ -94,14 +68,35 @@ function layout_apps() {
           )
         );
       }
+      for(let i = 0, l = appListToLoad.length; i < l; i++) {
+        const curKey = appListToLoad[i]
+        document.getElementById('xbtn-' + curKey).addEventListener('click', (e) => {
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            e.preventDefault();
+          
+            const xBtn = document.getElementById('xbtn-' + curKey)
+            alert($('#xbtn-' + curKey).attr('class'));
+        })
+        document.getElementById('div-'+curKey).addEventListener('mouseover', () => {
+          document.getElementById('xbtn-'+curKey).style.display = 'block'
+        })
+        document.getElementById('div-'+curKey).addEventListener('mouseout', () => {
+          document.getElementById('xbtn-'+curKey).style.display = 'none'
+        })
+      }
 
     })
 
     .catch(err => {
       console.error(err)
     })
+  
+  
 
 }
+
+
 
 //
 // Layout the panel and set up event handlers
