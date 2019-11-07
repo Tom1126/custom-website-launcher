@@ -71,12 +71,18 @@ function layout_apps() {
       for(let i = 0, l = appListToLoad.length; i < l; i++) {
         const curKey = appListToLoad[i]
         document.getElementById('xbtn-' + curKey).addEventListener('click', (e) => {
+            console.log(`Current key: ${curKey}`)
+            delete wholeList[curKey]
+            console.log(appListToLoad)
+            
+            browser.storage.local.set({
+            'appList': wholeList
+          });
+          load_panel()
+
             e.stopImmediatePropagation();
             e.stopPropagation();
             e.preventDefault();
-          
-            const xBtn = document.getElementById('xbtn-' + curKey)
-            alert($('#xbtn-' + curKey).attr('class'));
         })
         document.getElementById('div-'+curKey).addEventListener('mouseover', () => {
           document.getElementById('xbtn-'+curKey).style.display = 'block'
