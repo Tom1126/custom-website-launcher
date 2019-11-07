@@ -3,7 +3,6 @@
 // -------------------------------------------------
 var has_update = 0;
 var sequence = new Array();
-var websites;
 
 // -------------------------------------------------
 // Helper functions
@@ -26,69 +25,78 @@ function get_sequence() {
 // Based on the current app sequence, construct the grid layout in the panel
 //
 function layout_apps() {
+
+  // Empties the websites list displayed in the pop up
   $("#ga-grid").empty();
 
+  // Get the websites list from the storage
   browser.storage.local.get('appList')
     .then(results => {
+
+      // Get the websites list
       const appListToLoad = Object.keys(results.appList)
-      console.log(`Loading applist 2`)
-      console.log(appListToLoad)
 
       const wholeList = results.appList
-      websites = results.appList
 
+      // Goes through the whole websites list
       for (let i = 0; i < appListToLoad.length; i++) {
-        key = appListToLoad[i];
+        
+        //Get current website
         const curKey = appListToLoad[i]
 
+        // Add the website to the list to be displayed
         $("#ga-grid").append(
           $('<div>')
           .append($('<li>').attr('class', 'ui-state-default').data('ga-name', curKey).append(
-              $('<a>').attr('href', wholeList[key]['url'])
-              .attr('class', 'ga-lnk')
-              .attr('id', 'div-' + curKey).append(
+            $('<a>').attr('href', wholeList[curKey]['url'])
+            .attr('class', 'ga-lnk')
+            .attr('id', 'div-' + curKey).append(
 
-                $('<div>').attr('class', 'nein-wrapper').append(
-                  $('<div>').attr('class', 'ga-ico-nein gi-' + key).attr('style','display: none')
-                    .attr('id', 'xbtn-'+curKey)
-                )
-            ).append(
-                $('<span>').attr('class', 'ga-ico gi-' + curKey)
-                .append(
-                  $('<img>')
-                  .attr('height', '32')
-                  .attr('width', '32')
-                  .attr('src', wholeList[curKey]['faviconurl'] ? wholeList[curKey]['faviconurl'] : `gapps-icons.png`)
-                )
-                .css('background-position', wholeList[curKey]['iconpos'])
-              ).append(
-                $('<span>').attr('class', 'ga-ico-desc').text(wholeList[curKey]['desc'])
+              $('<div>').attr('class', 'nein-wrapper').append(
+                $('<div>').attr('class', 'ga-ico-nein gi-' + curKey).attr('style', 'display: none')
+                .attr('id', 'xbtn-' + curKey)
               )
+            ).append(
+              $('<span>').attr('class', 'ga-ico gi-' + curKey)
+              .append(
+                $('<img>')
+                .attr('height', '32')
+                .attr('width', '32')
+                .attr('src', wholeList[curKey]['faviconurl'] ? wholeList[curKey]['faviconurl'] : `gapps-icons.png`)
+              )
+              .css('background-position', wholeList[curKey]['iconpos'])
+            ).append(
+              $('<span>').attr('class', 'ga-ico-desc').text(wholeList[curKey]['desc'])
             )
-          )
+          ))
         );
       }
-      for(let i = 0, l = appListToLoad.length; i < l; i++) {
+
+      // Add event listeners for the x buttons on each website
+      for (let i = 0, l = appListToLoad.length; i < l; i++) {
         const curKey = appListToLoad[i]
+
+        // Adds event listener to delete website from websites list
         document.getElementById('xbtn-' + curKey).addEventListener('click', (e) => {
-            console.log(`Current key: ${curKey}`)
-            delete wholeList[curKey]
-            console.log(appListToLoad)
-            
-            browser.storage.local.set({
+          
+          delete wholeList[curKey]
+          
+          // Updates the list on storage and loads the panel
+          browser.storage.local.set({
             'appList': wholeList
           });
+          
           load_panel()
 
-            e.stopImmediatePropagation();
-            e.stopPropagation();
-            e.preventDefault();
+          e.stopImmediatePropagation();
+          e.stopPropagation();
+          e.preventDefault();
         })
-        document.getElementById('div-'+curKey).addEventListener('mouseover', () => {
-          document.getElementById('xbtn-'+curKey).style.display = 'block'
+        document.getElementById('div-' + curKey).addEventListener('mouseover', () => {
+          document.getElementById('xbtn-' + curKey).style.display = 'block'
         })
-        document.getElementById('div-'+curKey).addEventListener('mouseout', () => {
-          document.getElementById('xbtn-'+curKey).style.display = 'none'
+        document.getElementById('div-' + curKey).addEventListener('mouseout', () => {
+          document.getElementById('xbtn-' + curKey).style.display = 'none'
         })
       }
 
@@ -105,12 +113,6 @@ function layout_apps() {
 function load_panel() {
 
   layout_apps();
-
-  //
-  // Set up grid sorting
-  //
-  //$("#ga-grid").sortable();
-  //$("#ga-grid").disableSelection();
 
   //
   // Let add-on know that app sequence was changed
@@ -147,50 +149,9 @@ function load_panel() {
   });
 }
 
-//
-// Split the comma separated app list into an array. Use only the first
-// 9 apps to form 3x3 grid
-//
-function get_applist_arr(applist) {
-  var ret;
-
-  const list = Object.keys(applist).slice(0, 36).join(",")
-
-  ret = list.split(",", 9)
-  //ret = applist.split(",", 9)
-  ret.map(function (app) {
-    app.replace(/\s+/gi, '');
-  });
-
-  return ret;
-};
-
-//
-// Helper function for validating items in the App list array.
-// Returns: applist if valid, empty array else
-//
-// Validated to make sure that App list items are valid keys to
-// the App information object
-//
-function validate_applist(applist, gapps_info) {
-  applist.every(function (e, i, a) {
-    if (!gapps_info.e) {
-      return new Array;
-    }
-  });
-
-  return applist;
-}
-
-function loadPanel() {
-
-  load_panel()
-}
-//console.log('item:::', items)
-
-$(function () {
-  loadPanel()
-})
 // -------------------------------------------------
 // Main function that sets up the panel
 // -------------------------------------------------
+$(function () {
+  load_panel()
+})
