@@ -91,12 +91,7 @@ function layout_apps() {
     .catch(err => {
       console.error(err)
     })
-  
-  
-
 }
-
-
 
 //
 // Layout the panel and set up event handlers
@@ -184,7 +179,6 @@ function validate_applist(applist, gapps_info) {
 function loadPanel() {
 
   load_panel()
-
 }
 //console.log('item:::', items)
 
