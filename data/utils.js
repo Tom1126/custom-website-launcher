@@ -15,7 +15,7 @@ function getTabsInfo() {
       const splitTitle = activeTab.title.split(" ")[0]
 
       // Prompts user to add description 
-      const userDesc = prompt(`Enter a descrition for the website`, splitTitle)
+      const userDesc = prompt(`Enter a description for the website`, splitTitle)
 
       //Executes when the description entered by the user is not null and empty 
       if (userDesc !== null && userDesc.trim() !== '') {
